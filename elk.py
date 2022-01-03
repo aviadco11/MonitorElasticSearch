@@ -25,7 +25,6 @@ def Check_Health_ELK():
     return res['status']
 
 
-
 def Check_Alerts_Idx_ELK():
     res = requests.get('http://20.105.254.110:9200')
     es = Elasticsearch("20.105.254.110:9200")
