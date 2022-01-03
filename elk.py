@@ -6,7 +6,7 @@ import requests
 def Check_Valid_ELK():
 
     try:
-        res = requests.get('http://20.105.254.110:9200')
+        res = requests.get('https://20.126.105.255:9200', auth=('elastic', 'PAgXaK15yCiOUvuS7PuJ'), verify=False)
         print(res.content)
         if res.status_code != 200:
             print("ConnectTimeout!")
