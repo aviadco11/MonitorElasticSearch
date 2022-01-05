@@ -3,10 +3,12 @@ from elasticsearch import Elasticsearch
 import smtplib
 import requests
 
-def Check_Valid_ELK():
+from ssl import create_default_context
 
+def Check_Valid_ELK():
+    print("\nCheck Valid ELK\n")
     try:
-        res = requests.get('https://20.126.105.255:9200', auth=('elastic', 'PAgXaK15yCiOUvuS7PuJ'), verify=False)
+        res = requests.get(url = 'https://elk4.westeurope.cloudapp.azure.com:9200', auth=('elastic','4jifzD6Ey8H2qSEmXsrt'), verify=False, timeout=4 )
         print(res.content)
         if res.status_code != 200:
             print("ConnectTimeout!")
@@ -17,18 +19,16 @@ def Check_Valid_ELK():
     return True
 
 
-def Check_Health_ELK():
-    es = Elasticsearch("20.105.254.110:9200")
+def Check_Health_ELK(es):
+    print("\nCheck Health\n")
     print(es.cluster.health())
     res = es.cluster.health()
 
     return res['status']
 
 
-
-def Check_Alerts_Idx_ELK():
-    res = requests.get('http://20.105.254.110:9200')
-    es = Elasticsearch("20.105.254.110:9200")
+def Check_Alerts_Idx_ELK(es):
+    print("\nCheck Alerts\n")
     res = es.search(index="test", query={"match_all": {}})
     print("Got %d Hits:" % res['hits']['total']['value'])
     for hit in res['hits']['hits']:
@@ -44,7 +44,7 @@ def SendEmail(email,password,from_address,to_address,msg):
         smtp_object.sendmail(from_address, to_address, msg)
     except Exception as e:
         print(e)
-        print("Mail Wasnt send")
+        print("Mail Wasnt send\n")
         return False
     print("Mail Was send")
     return False
@@ -56,13 +56,22 @@ to_address = 'aviad.co1@gmail.com'
 password = 'mnnonvbgyoadqyhy'
 
 if Check_Valid_ELK():
-        if Check_Health_ELK() != 'green':
-            subject = "ElasticSearch Healthy - Critical Alert !!!"
+        context = create_default_context(cafile="c:/certs/ca.crt")
+        es = Elasticsearch(
+        ['elk4.westeurope.cloudapp.azure.com'],
+        #http_auth=('elastic', '4jifzD6Ey8H2qSEmXsrt'),
+        api_key='VWdGUEtuNEJSeTdWZnFtcUVlcVo6eVpZOTM1QzFRMjZHVU9GVmlxdlhSQQ',
+        scheme="https",
+        port=9200,
+        ssl_context=context,
+        )
+        if Check_Health_ELK(es) != 'green':
+            subject = "ElasticSearch Not Healthy - Critical Alert !!!"
             message = "ElasticSearch Status is not Healthy"
             msg = "Subject: " + subject + '\n' + message
             SendEmail(email, password, from_address, to_address, msg)
             print(msg)
-        Check_Alerts_Idx_ELK()
+        Check_Alerts_Idx_ELK(es)
 else:
     subject = "ElasticSearch Validation - Critical Alert !!!"
     message = "ElasticSearch is Down"
