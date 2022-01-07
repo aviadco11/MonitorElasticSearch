@@ -8,7 +8,7 @@ from ssl import create_default_context
 def Check_Valid_ELK():
     print("\nCheck Valid ELK\n")
     try:
-        res = requests.get(url = 'https://elk4.westeurope.cloudapp.azure.com:9200', auth=('elastic','4jifzD6Ey8H2qSEmXsrt'), verify=False, timeout=4 )
+        res = requests.get(url = 'https://elk6.westeurope.cloudapp.azure.com:9200', auth=('elastic','xune7bvbmFmmhAPjnrqA'), verify=False, timeout=4 )
         print(res.content)
         if res.status_code != 200:
             print("ConnectTimeout!")
@@ -29,7 +29,7 @@ def Check_Health_ELK(es):
 
 def Check_Alerts_Idx_ELK(es):
     print("\nCheck Alerts\n")
-    res = es.search(index="test", query={"match_all": {}})
+    res = es.search(index="index", query={"match_all": {}})
     print("Got %d Hits:" % res['hits']['total']['value'])
     for hit in res['hits']['hits']:
         print(hit["_source"])
@@ -56,11 +56,11 @@ to_address = 'aviad.co1@gmail.com'
 password = 'mnnonvbgyoadqyhy'
 
 if Check_Valid_ELK():
-        context = create_default_context(cafile="c:/certs/ca.crt")
+        context = create_default_context(cafile=""c:/certs/elasticsearch-ca.pem"")
         es = Elasticsearch(
-        ['elk4.westeurope.cloudapp.azure.com'],
-        #http_auth=('elastic', '4jifzD6Ey8H2qSEmXsrt'),
-        api_key='VWdGUEtuNEJSeTdWZnFtcUVlcVo6eVpZOTM1QzFRMjZHVU9GVmlxdlhSQQ',
+        ['elk6.westeurope.cloudapp.azure.com'],
+        http_auth=('elastic', 'xune7bvbmFmmhAPjnrqA'),
+        #api_key='VWdGUEtuNEJSeTdWZnFtcUVlcVo6eVpZOTM1QzFRMjZHVU9GVmlxdlhSQQ',
         scheme="https",
         port=9200,
         ssl_context=context,
